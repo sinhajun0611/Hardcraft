@@ -1,0 +1,15 @@
+#!/bin/bash
+
+DIR=".server"
+VERSION=$(curl -s https://api.papermc.io/v2/projects/paper | \
+    jq -r '.versions[-1]')
+EULA="eula.txt"
+JAR_NAME="paper.jar"
+# Get latest build number
+BUILD_NUMBER_LATEST=$(curl -s "https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds" | jq -r '.builds | last | .build')
+BUILD_NUMBER="${2:-${BUILD_NUMBER_LATEST}}"
+URL="https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds/${BUILD_NUMBER}/downloads/paper-${VERSION}-${BUILD_NUMBER}.jar"
+
+mkdir -p "$DIR" && cd "$_" || exit
+wget "$URL" -O "$JAR_NAME" && echo "eula=true" > "$EULA"
+java -jar "$JAR_NAME"
